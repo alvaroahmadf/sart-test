@@ -13,7 +13,7 @@ function startCountdown() {
     `;
     countdownInterval = setInterval(() => {
         if (countdownValue > 0) {
-            document.getElementById('countdown').textContent = `Countdown...\n${countdownValue}`;
+            document.getElementById('countdown').textContent = `Get Ready!  \n${countdownValue}`;
             countdownValue--;
         } else {
             clearInterval(countdownInterval);
