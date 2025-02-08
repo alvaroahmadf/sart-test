@@ -1,0 +1,34 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #000; /* Ubah latar belakang menjadi hitam */
+    color: #fff; /* Ubah warna teks menjadi putih untuk kontras */
+}
+
+#app {
+    text-align: center;
+    background-color: transparent; /* Hapus latar belakang kotak */
+    padding: 0; /* Hapus padding */
+    border-radius: 0; /* Hapus sudut bulat */
+    box-shadow: none; /* Hapus bayangan */
+}
+
+#countdown {
+    font-size: 72px; /* Ubah ukuran countdown menjadi lebih besar */
+    margin: 20px 0;
+    white-space: pre-line;
+}
+
+#number-display {
+    font-size: 100px; /* Ubah ukuran angka menjadi lebih besar */
+    margin: 20px 0;
+}
+
+#feedback {
+    margin: 10px 0;
+    color: red;
+}
