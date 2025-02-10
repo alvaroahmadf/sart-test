@@ -1,12 +1,15 @@
-let experimentDuration = 10; // 10 detik
+let experimentDuration = 10; // Durasi eksperimen dalam detik
 let timer;
-let displayInterval; // Untuk interval tampilan angka
 let responses = [];
-let isExperimentRunning = false; // Menandakan apakah eksperimen sedang berjalan
+let isExperimentRunning = false;
+let userResponded = false; // Status apakah pengguna sudah menekan SPACEBAR
+let missedResponseTimeout; // Timeout untuk mendeteksi respons yang terlewat
+let allowLateResponse = false; // Izinkan respons setelah titik muncul
+let delayBeforeNextNumber = 1000; // Jeda perpindahan ke angka berikutnya
 
 function startExperiment() {
     document.getElementById('feedback').textContent = '';
-    isExperimentRunning = true; // Set eksperimen berjalan
+    isExperimentRunning = true;
     displayNumber();
     startTimer();
 }
@@ -23,56 +26,92 @@ function startTimer() {
 
 function endExperiment() {
     clearInterval(timer);
-    clearInterval(displayInterval); // Hentikan interval tampilan angka
+    clearTimeout(missedResponseTimeout);
     document.getElementById('number-display').textContent = '';
     document.getElementById('feedback').textContent = 'Test finished!';
     console.log(responses);
-    isExperimentRunning = false; // Set eksperimen tidak berjalan
+    isExperimentRunning = false;
 }
 
 function displayNumber() {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const randomIndex = Math.floor(Math.random() * numbers.length);
     const randomNumber = numbers[randomIndex];
-    document.getElementById('number-display').textContent = randomNumber;
 
-    // Beri kesempatan untuk menekan spasi selama 1000ms
-    setTimeout(() => {
-        // Tampilkan lingkaran setelah 500ms
-        document.getElementById('number-display').textContent = '●'; // Tampilkan lingkaran
-        setTimeout(() => {
-            // Setelah 500ms, kembali ke angka
-            if (isExperimentRunning) {
-                displayNumber(); // Tampilkan angka lagi
+    document.getElementById('number-display').textContent = randomNumber;
+    
+    userResponded = false; // Reset status respons
+    allowLateResponse = false; // Reset status izin respon lambat
+    document.getElementById('feedback').textContent = ''; // Hapus feedback sebelumnya
+
+    // Hapus timeout sebelumnya sebelum membuat timeout baru
+    clearTimeout(missedResponseTimeout);
+
+    // Jika angka bukan 3, buat timeout untuk cek apakah pengguna melewatkan respons
+    if (randomNumber !== 3) {
+        missedResponseTimeout = setTimeout(() => {
+            if (!userResponded) {
+                document.getElementById('feedback').textContent = 'Incorrect! You missed the response.';
+                responses.push({
+                    number: randomNumber,
+                    responseTime: null,
+                    correct: false
+                });
             }
-        }, 500);
+        }, 1000); // Waktu tunggu respons
+    }
+
+    // Setelah 500ms, ubah angka menjadi titik
+    setTimeout(() => {
+        document.getElementById('number-display').textContent = '●';
+        allowLateResponse = true; // Izinkan user menekan SPACEBAR setelah titik muncul
+
+        setTimeout(() => {
+            if (isExperimentRunning) {
+                displayNumber();
+            }
+        }, delayBeforeNextNumber); // Jeda hanya 500ms sebelum angka berikutnya muncul
     }, 500);
 }
 
 function checkResponse(number) {
+    if (userResponded) return; // Jika sudah merespons, abaikan respons tambahan
+
+    userResponded = true; // Tandai bahwa pengguna telah merespons
+    clearTimeout(missedResponseTimeout); // Hentikan timeout missed response
+
     const responseTime = new Date().getTime();
-    const response = {
+    let correctResponse = number !== 3;
+    
+    responses.push({
         number: number,
         responseTime: responseTime,
-        correct: number !== 3
-    };
-    responses.push(response);
+        correct: correctResponse
+    });
 
-    // Berikan feedback
-    if (number === 3) {
-        document.getElementById('feedback').textContent = 'Wrong! You should not have pressed the spacebar.';
-    } else {
+    if (correctResponse) {
         document.getElementById('feedback').textContent = 'Correct!';
+    } else {
+        document.getElementById('feedback').textContent = 'Wrong! You should not have pressed the spacebar.';
     }
 }
 
-// Event listener untuk mendeteksi penekanan spasi
+// Event listener untuk SPACEBAR
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' && isExperimentRunning) {
-        const displayedNumber = parseInt(document.getElementById('number-display').textContent);
-        checkResponse(displayedNumber);
+        const displayedText = document.getElementById('number-display').textContent;
+
+        // Jika angka belum berubah menjadi titik, cek sebagai angka
+        if (!isNaN(parseInt(displayedText))) {
+            checkResponse(parseInt(displayedText));
+        }
+        // Jika angka sudah berubah menjadi titik, tetap anggap sebagai "Correct!" jika bukan angka 3
+        else if (allowLateResponse) {
+            document.getElementById('feedback').textContent = 'Correct!';
+            userResponded = true;
+            clearTimeout(missedResponseTimeout);
+        }
     }
 });
 
-// Mulai eksperimen saat halaman dimuat
 startExperiment();
