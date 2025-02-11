@@ -5,30 +5,33 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #000; /* Ubah latar belakang menjadi hitam */
-    color: #fff; /* Ubah warna teks menjadi putih untuk kontras */
+    background-color: #000; /* Latar belakang hitam */
+    color: #fff; /* Warna teks putih */
 }
 
 #app {
     text-align: center;
-    background-color: transparent; /* Hapus latar belakang kotak */
-    padding: 0; /* Hapus padding */
-    border-radius: 0; /* Hapus sudut bulat */
-    box-shadow: none; /* Hapus bayangan */
+    position: relative; /* Dijadikan referensi untuk feedback */
 }
 
 #countdown {
-    font-size: 72px; /* Ubah ukuran countdown menjadi lebih besar */
+    font-size: 72px; /* Ukuran countdown lebih besar */
     margin: 20px 0;
     white-space: pre-line;
 }
 
 #number-display {
-    font-size: 100px; /* Ubah ukuran angka menjadi lebih besar */
+    font-size: 200px; /* Ukuran angka lebih besar */
     margin: 20px 0;
 }
 
 #feedback {
-    margin: 10px 0;
+    position: absolute;
+    top: calc(100% + 20px); /* Pastikan feedback berada di bawah angka/titik */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px; /* Ukuran teks kembali normal */
     color: red;
+    width: max-content;
+    text-align: center;
 }

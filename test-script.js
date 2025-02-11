@@ -6,6 +6,7 @@ let userResponded = false; // Status apakah pengguna sudah menekan SPACEBAR
 let missedResponseTimeout; // Timeout untuk mendeteksi respons yang terlewat
 let allowLateResponse = false; // Izinkan respons setelah titik muncul
 let delayBeforeNextNumber = 1000; // Jeda perpindahan ke angka berikutnya
+let numberToDotDelay = 300; // Waktu sebelum angka berubah menjadi titik (lebih cepat)
 
 function startExperiment() {
     document.getElementById('feedback').textContent = '';
@@ -61,7 +62,7 @@ function displayNumber() {
         }, 1000); // Waktu tunggu respons
     }
 
-    // Setelah 500ms, ubah angka menjadi titik
+    // Percepat perubahan angka ke titik menjadi 300ms
     setTimeout(() => {
         document.getElementById('number-display').textContent = '●';
         allowLateResponse = true; // Izinkan user menekan SPACEBAR setelah titik muncul
@@ -70,8 +71,8 @@ function displayNumber() {
             if (isExperimentRunning) {
                 displayNumber();
             }
-        }, delayBeforeNextNumber); // Jeda hanya 500ms sebelum angka berikutnya muncul
-    }, 500);
+        }, delayBeforeNextNumber); // Jeda sebelum angka berikutnya muncul
+    }, numberToDotDelay); // Waktu sebelum angka berubah menjadi titik (300ms)
 }
 
 function checkResponse(number) {
