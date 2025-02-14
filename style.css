@@ -1,12 +1,14 @@
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #000; /* Latar belakang hitam */
-    color: #fff; /* Warna teks putih */
 }
 
 #app {
@@ -34,4 +36,122 @@ body {
     color: red;
     width: max-content;
     text-align: center;
+}
+
+/* RESULTS */
+/* Main Container */
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Test Results Section */
+.results-section {
+    width: 25%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #1a1a1a;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    white-space: normal;
+    max-width: 350px; /* Membatasi agar tidak melebar */
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+p {
+    margin: 5px 0;
+    font-size: 16px;
+    word-wrap: break-word;
+}
+
+/* Response Table Section */
+.table-section {
+    width: 75%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #000000;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #444;
+    padding: 12px;
+    text-align: center;
+    color: white;
+}
+
+th {
+    background-color: #333;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+tr:hover {
+    background-color: #333;
+}
+
+/* Correct and Incorrect Styles */
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+
+/* Input and Form Styling */
+.results-section h3 {
+    margin-top: 50px;
+}
+
+.results-section label {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.results-section input,
+.results-section select {
+    width: 100%; /* Menyamakan lebar semua input dan select */
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    box-sizing: border-box; /* Memastikan elemen termasuk padding dalam perhitungan lebar */
+}
+
+.results-section button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.results-section button:hover {
+    background-color: #218838;
 }

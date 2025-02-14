@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results</title>
+    <link rel="icon" href="assets/icon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="body-result">
+    <div class="container">
+        <div class="results-section">
+            <h2>Test Results</h2>
+            <p><strong>Number of Go Trials:</strong> <span id="go-trials"></span></p>
+            <p><strong>Number of Go Mistakes:</strong> <span id="go-mistakes"></span> (<span id="go-mistake-percentage"></span>)</p>
+            <p><strong>Number of No-Go Trials:</strong> <span id="no-go-trials"></span></p>
+            <p><strong>Number of No-Go Mistakes:</strong> <span id="no-go-mistakes"></span> (<span id="no-go-mistake-percentage"></span>)</p>
+            <h3>Save Your Test Result</h3>
+                <label for="full-name">Full Name:</label>
+                <input type="text" id="full-name" placeholder="Enter your name">
+                <label for="age">Age:</label>
+                <input type="number" id="age" placeholder="Enter your age">
+                <label for="gender">Gender:</label>
+                <select id="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <button id="save-csv">Save as CSV</button>
+                <p id="save-warning" style="color: red; display: none;">⚠ Please save your test result before leaving.</p>
+        </div>
+
+        <div class="table-section">
+            <h2>Response Table</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trial #</th>
+                        <th>Timestamp</th>
+                        <th>Number Shown</th>
+                        <th>Response Time (ms)</th>
+                        <th>Correct?</th>
+                    </tr>
+                </thead>
+                <tbody id="responseTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="results-script.js"></script>
+</body>
+</html>
