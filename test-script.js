@@ -140,7 +140,7 @@ function checkResponse(number) {
     document.getElementById('number-display').textContent = '●';
 
     if (number !== noGoNumber) {
-        document.getElementById('feedback').textContent = '✅ Correct!';
+        document.getElementById('feedback').textContent = '✅';
         responses.push({ number, responseTime, correct: true, timestamp });
     } else {
         noGoMistakes++;
@@ -176,7 +176,7 @@ document.addEventListener('keyup', (event) => {
 // Fungsi untuk mengakhiri eksperimen
 function endExperiment() {
     document.getElementById('number-display').textContent = '';
-    document.getElementById('feedback').textContent = 'Test finished!';
+    document.getElementById('feedback').textContent = 'Loading Your Test Result...';
 
     localStorage.setItem('sartResults', JSON.stringify({
         goTrials, goMistakes, noGoTrials, noGoMistakes, responses
