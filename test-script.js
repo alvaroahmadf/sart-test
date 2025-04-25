@@ -1,6 +1,6 @@
 // Konfigurasi Eksperimen
-let trialsPerSession = 18;
-let noGoCountPerSession = 2;
+let trialsPerSession = 50;
+let noGoCountPerSession = 12;
 let noGoNumber = 3;
 let delayBeforeNextNumber = 900; // Durasi tambahan sebelum ke angka berikutnya
 let numberToDotDuration = 250; // Durasi angka sebelum berubah menjadi titik (●)
