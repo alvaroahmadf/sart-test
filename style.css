@@ -119,39 +119,113 @@ tr:hover {
     color: red;
 }
 
-/* Input and Form Styling */
-.results-section h3 {
-    margin-top: 50px;
+/* MODAL STYLES (NEW ADDITION) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
-.results-section label {
-    display: block;
+.modal.show {
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #1a1a1a;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #333;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content label {
     margin-top: 10px;
-    font-size: 14px;
+    color: white;
 }
 
-.results-section input,
-.results-section select {
-    width: 100%; /* Menyamakan lebar semua input dan select */
+.modal-content input,
+.modal-content select {
     padding: 8px;
     margin-top: 5px;
-    margin-bottom: 10px;
     border-radius: 5px;
     border: none;
-    font-size: 16px;
-    box-sizing: border-box; /* Memastikan elemen termasuk padding dalam perhitungan lebar */
+    background-color: #333;
+    color: white;
 }
 
-.results-section button {
-    width: 100%;
+.modal-content button {
+    margin-top: 20px;
     padding: 10px;
-    margin-top: 10px;
     background-color: #28a745;
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
 }
 
-.results-section button:hover {
+.modal-content button:hover {
     background-color: #218838;
+}
+
+/* Thank You Page Styles */
+.thank-you-container {
+    text-align: center;
+    /* margin-top: 20vh; */
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.thank-you-container h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.action-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin-top: -1rem; /* Tarik ke atas dengan margin negatif */
+}
+
+.back-link {
+    color: #28a745;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #28a745;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.back-link:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+.show-results-link {
+    color: #6c757d;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.show-results-link:hover {
+    color: #be2b2b;
 }

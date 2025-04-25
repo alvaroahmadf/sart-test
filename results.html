@@ -8,26 +8,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body id="body-result">
-    <div class="container">
+    <div id="thankYouMessage" class="thank-you-container">
+        <h2>Terima Kasih Telah Melakukan Tes!</h2>
+        <div class="action-links">
+            <a href="index.html" class="back-link">Kembali ke Halaman Awal</a>
+            <span id="showResultsLink" class="show-results-link">Perlihatkan Hasil Tes</span>
+        </div>
+    </div>
+
+    <div id="resultsContainer" class="container" style="display:none;">
         <div class="results-section">
             <h2>Test Results</h2>
             <p><strong>Number of Go Trials:</strong> <span id="go-trials"></span></p>
             <p><strong>Number of Go Mistakes:</strong> <span id="go-mistakes"></span> (<span id="go-mistake-percentage"></span>)</p>
             <p><strong>Number of No-Go Trials:</strong> <span id="no-go-trials"></span></p>
             <p><strong>Number of No-Go Mistakes:</strong> <span id="no-go-mistakes"></span> (<span id="no-go-mistake-percentage"></span>)</p>
-            <h3>Save Your Test Result</h3>
-                <label for="full-name">Full Name:</label>
-                <input type="text" id="full-name" placeholder="Enter your name">
-                <label for="age">Age:</label>
-                <input type="number" id="age" placeholder="Enter your age">
-                <label for="gender">Gender:</label>
-                <select id="gender">
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-                <button id="save-csv">Save as CSV</button>
-                <p id="save-warning" style="color: red; display: none;">⚠ Please save your test result before leaving.</p>
+
+            <a href="index.html" class="back-link" style="margin-top: 20px;">Kembali ke Halaman Awal</a>
+
         </div>
 
         <div class="table-section">
