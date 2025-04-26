@@ -1,10 +1,23 @@
+// Check demo mode first
+const isDemo = localStorage.getItem('demoMode') === 'true';
+
+// Load settings from localStorage or use defaults
+const settings = JSON.parse(localStorage.getItem('testSettings')) || {
+    trialsPerSession: isDemo ? 18 : 60,
+    noGoCountPerSession: isDemo ? 2 : 6,
+    noGoNumber: 3,
+    delayBeforeNextNumber: 900,
+    numberToDotDuration: 250,
+    incorrectDelayDuration: 3000
+};
+
 // Konfigurasi Eksperimen
-let trialsPerSession = 10;
-let noGoCountPerSession = 2;
-let noGoNumber = 3;
-let delayBeforeNextNumber = 900; // Durasi tambahan sebelum ke angka berikutnya
-let numberToDotDuration = 250; // Durasi angka sebelum berubah menjadi titik (●)
-let incorrectDelayDuration = 3000; // Delay tambahan untuk kondisi incorrect
+let trialsPerSession = settings.trialsPerSession;
+let noGoCountPerSession = settings.noGoCountPerSession;
+let noGoNumber = settings.noGoNumber;
+let delayBeforeNextNumber = settings.delayBeforeNextNumber;
+let numberToDotDuration = settings.numberToDotDuration;
+let incorrectDelayDuration = settings.incorrectDelayDuration;
 
 // Variabel Eksperimen
 let trialCount = 0;
@@ -18,13 +31,11 @@ let noGoTrials = 0;
 let noGoMistakes = 0;
 let numberSequence = [];
 let startTime = 0;
-let timeoutId1 = null; // Untuk timeout perubahan angka ke titik
-let timeoutId2 = null; // Untuk timeout transisi ke angka berikutnya
+let timeoutId1 = null;
+let timeoutId2 = null;
 
 function getLocalTimestamp() {
     let now = new Date();
-
-    // Konversi ke zona waktu Jakarta (UTC+7)
     let options = { timeZone: "Asia/Jakarta" };
     
     let year = new Intl.DateTimeFormat("id-ID", { year: "numeric", ...options }).format(now);
@@ -33,8 +44,6 @@ function getLocalTimestamp() {
     let hour = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", hour12: false, ...options }).format(now);
     let minute = new Intl.DateTimeFormat("id-ID", { minute: "2-digit", ...options }).format(now);
     let second = new Intl.DateTimeFormat("id-ID", { second: "2-digit", ...options }).format(now);
-
-    // Mendapatkan milidetik (3 digit)
     let millisecond = now.getMilliseconds().toString().padStart(3, "0");
 
     return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
@@ -78,7 +87,6 @@ function displayNumber() {
         return;
     }
 
-    // Hentikan timeout yang masih berjalan
     clearTimeout(timeoutId1);
     clearTimeout(timeoutId2);
 
@@ -96,18 +104,16 @@ function displayNumber() {
         noGoTrials++;
     }
 
-    // Set timeout untuk mengubah angka menjadi titik (●)
     timeoutId1 = setTimeout(() => {
         document.getElementById('number-display').textContent = '●';
     }, numberToDotDuration);
 
-    // Set timeout untuk pindah ke angka berikutnya jika user tidak merespons
     timeoutId2 = setTimeout(() => {
         allowResponse = false;
         if (!userResponded) {
             if (currentNumber !== noGoNumber) {
                 goMistakes++;
-                responses.push({ number: currentNumber, responseTime: null, correct: false });
+                responses.push({ number: currentNumber, responseTime: null, correct: false, timestamp: getLocalTimestamp() });
                 document.getElementById('feedback').textContent = '❌ Incorrect! You missed the response.';
 
                 timeoutId2 = setTimeout(() => {
@@ -115,7 +121,7 @@ function displayNumber() {
                     displayNumber();
                 }, incorrectDelayDuration);
             } else {
-                responses.push({ number: currentNumber, responseTime: null, correct: true });
+                responses.push({ number: currentNumber, responseTime: null, correct: true, timestamp: getLocalTimestamp() });
                 trialCount++;
                 displayNumber();
             }
@@ -129,14 +135,12 @@ function checkResponse(number) {
     userResponded = true;
     allowResponse = false;
 
-    // Hentikan semua timeout yang masih berjalan
     clearTimeout(timeoutId1);
     clearTimeout(timeoutId2);
 
     let responseTime = new Date().getTime() - startTime;
-    let timestamp = getLocalTimestamp(); // Gunakan format waktu Indonesia (UTC+7)
+    let timestamp = getLocalTimestamp();
 
-    // Ubah angka menjadi titik (●) segera setelah user merespons
     document.getElementById('number-display').textContent = '●';
 
     if (number !== noGoNumber) {
@@ -147,17 +151,14 @@ function checkResponse(number) {
         document.getElementById('feedback').textContent = '❌ Incorrect! You should not have pressed the spacebar.';
         responses.push({ number, responseTime, correct: false, timestamp });
 
-        // Tambahkan delay sebelum menampilkan angka berikutnya
         timeoutId2 = setTimeout(() => {
             trialCount++;
             displayNumber();
         }, incorrectDelayDuration);
     }
 
-    // Hitung waktu sisa agar total durasi trial tetap 1150ms
-    let remainingTime = Math.max(0, 1150 - responseTime);
+    let remainingTime = Math.max(0, numberToDotDuration + delayBeforeNextNumber - responseTime);
 
-    // Jika respons benar, lanjutkan ke angka berikutnya tanpa delay tambahan
     if (number !== noGoNumber) {
         timeoutId2 = setTimeout(() => {
             trialCount++;
@@ -166,7 +167,7 @@ function checkResponse(number) {
     }
 }
 
-// Mendeteksi penekanan tombol spasi dengan benar
+// Mendeteksi penekanan tombol spasi
 document.addEventListener('keyup', (event) => {
     if (event.code === 'Space' && isExperimentRunning && allowResponse) {
         checkResponse(numberSequence[trialCount]);

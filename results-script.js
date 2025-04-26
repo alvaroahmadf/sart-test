@@ -6,15 +6,29 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Get user data
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (!userData) {
-        document.getElementById('thankYouMessage').innerHTML = "<h2>Data peserta tidak ditemukan</h2>";
-        return;
-    }
+    // Check if in demo mode
+    const isDemo = localStorage.getItem('demoMode') === 'true';
+    
+    if (!isDemo) {
+        // Get user data only if not in demo mode
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        if (!userData) {
+            document.getElementById('thankYouMessage').innerHTML = "<h2>Data peserta tidak ditemukan</h2>";
+            return;
+        }
 
-    // Generate and download CSV immediately
-    generateAndDownloadCSV(userData, JSON.parse(storedData).responses);
+        // Generate and download CSV only if not in demo mode
+        generateAndDownloadCSV(userData, JSON.parse(storedData).responses);
+    } else {
+        // For demo mode, show different thank you message
+        document.getElementById('thankYouMessage').innerHTML = `
+            <h2>Demo Selesai!</h2>
+            <div class="action-links">
+                <a href="index.html" class="back-link">Kembali ke Halaman Awal</a>
+                <span id="showResultsLink" class="show-results-link">Perlihatkan Hasil Tes Demo</span>
+            </div>
+        `;
+    }
 
     // Set up show results button
     document.getElementById("showResultsLink").addEventListener("click", function() {
@@ -40,6 +54,7 @@ function displayResults(results) {
         noGoTrials ? ((noGoMistakes / noGoTrials) * 100).toFixed(0) + " %" : "0 %";
 
     let tableBody = document.getElementById("responseTableBody");
+    tableBody.innerHTML = ""; // Clear existing rows
     responses.forEach((response, index) => {
         let row = document.createElement("tr");
         row.innerHTML = `
@@ -58,6 +73,11 @@ function displayResults(results) {
 }
 
 function generateAndDownloadCSV(userData, responses) {
+    // Skip CSV generation in demo mode
+    if (localStorage.getItem('demoMode') === 'true') {
+        return;
+    }
+
     let csvContent = "Data Peserta\n";
     csvContent += `Nama Lengkap,${userData.fullName}\n`;
     csvContent += `Usia,${userData.age}\n`;

@@ -153,7 +153,7 @@ tr:hover {
 }
 
 .modal-content label {
-    margin-top: 10px;
+    margin-top: 0px;
     color: white;
 }
 
@@ -228,4 +228,44 @@ tr:hover {
 
 .show-results-link:hover {
     color: #be2b2b;
+}
+
+/* Tambahkan di bagian paling bawah file style.css */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.button-group button:hover {
+    opacity: 0.9;
+}
+
+#demoBtn {
+    background-color: #ffc107;
+    color: #000;
+}
+
+#settingsBtn {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+#saveSettings {
+    background-color: #28a745;
+    color: #fff;
+}
+
+#backToForm {
+    background-color: #6c757d;
+    color: #fff;
 }
