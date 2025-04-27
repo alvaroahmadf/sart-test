@@ -230,7 +230,7 @@ tr:hover {
     color: #be2b2b;
 }
 
-/* Tambahkan di bagian paling bawah file style.css */
+/* button setting */
 .button-group {
     display: flex;
     gap: 10px;
@@ -291,4 +291,9 @@ tr:hover {
     color: #ffc107;
     font-weight: bold;
     font-size: 20px;
+}
+
+.probe-results p {
+    margin: 12px 0;
+    margin-top: 5px;
 }

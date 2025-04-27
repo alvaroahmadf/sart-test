@@ -9,19 +9,19 @@ const settings = JSON.parse(localStorage.getItem('testSettings')) || {
     delayBeforeNextNumber: 900,
     numberToDotDuration: 250,
     incorrectDelayDuration: 3000,
-    probeCount: 0 // Default probe nonaktif
+    probeCount: 0
 };
 
-// Konfigurasi Eksperimen
-let trialsPerSession = settings.trialsPerSession;
-let noGoCountPerSession = settings.noGoCountPerSession;
-let noGoNumber = settings.noGoNumber;
-let delayBeforeNextNumber = settings.delayBeforeNextNumber;
-let numberToDotDuration = settings.numberToDotDuration;
-let incorrectDelayDuration = settings.incorrectDelayDuration;
-let probeCount = settings.probeCount || 0; // Jumlah probe
+// Experiment Configuration
+const trialsPerSession = settings.trialsPerSession;
+const noGoCountPerSession = settings.noGoCountPerSession;
+const noGoNumber = settings.noGoNumber;
+const delayBeforeNextNumber = settings.delayBeforeNextNumber;
+const numberToDotDuration = settings.numberToDotDuration;
+const incorrectDelayDuration = settings.incorrectDelayDuration;
+const probeCount = settings.probeCount || 0;
 
-// Variabel Eksperimen
+// Experiment Variables
 let trialCount = 0;
 let responses = [];
 let isExperimentRunning = false;
@@ -36,27 +36,17 @@ let startTime = 0;
 let timeoutId1 = null;
 let timeoutId2 = null;
 
-// Variabel Probe
+// Probe Variables
 let probeResponses = [];
 let remainingProbes = probeCount;
 let probeActive = false;
 
 function getLocalTimestamp() {
-    let now = new Date();
-    let options = { timeZone: "Asia/Jakarta" };
-    
-    let year = new Intl.DateTimeFormat("id-ID", { year: "numeric", ...options }).format(now);
-    let month = new Intl.DateTimeFormat("id-ID", { month: "2-digit", ...options }).format(now);
-    let day = new Intl.DateTimeFormat("id-ID", { day: "2-digit", ...options }).format(now);
-    let hour = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", hour12: false, ...options }).format(now);
-    let minute = new Intl.DateTimeFormat("id-ID", { minute: "2-digit", ...options }).format(now);
-    let second = new Intl.DateTimeFormat("id-ID", { second: "2-digit", ...options }).format(now);
-    let millisecond = now.getMilliseconds().toString().padStart(3, "0");
-
-    return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
+    const now = new Date();
+    const options = { timeZone: "Asia/Jakarta" };
+    return now.toLocaleString('id-ID', options) + '.' + now.getMilliseconds().toString().padStart(3, "0");
 }
 
-// Fungsi untuk menampilkan probe
 function showProbe() {
     if (probeActive || remainingProbes <= 0) return;
     
@@ -91,7 +81,6 @@ function showProbe() {
     document.body.appendChild(probeModal);
 }
 
-// Fungsi untuk menangani respon probe
 function handleProbeResponse(response) {
     const responseText = response === 1 ? 'Ya' : 'Tidak';
     probeResponses.push(response);
@@ -101,16 +90,12 @@ function handleProbeResponse(response) {
     
     setTimeout(() => {
         const probeModal = document.getElementById('probeModal');
-        if (probeModal) {
-            probeModal.remove();
-        }
+        if (probeModal) probeModal.remove();
         probeActive = false;
-        allowResponse = true;
-        displayNumber(); // Lanjutkan test
+        displayNumber();
     }, 1000);
 }
 
-// Event listener untuk probe
 document.addEventListener('keydown', (e) => {
     if (!probeActive) return;
     
@@ -123,7 +108,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Fungsi untuk memulai eksperimen
 function startExperiment() {
     document.getElementById('feedback').textContent = '';
     isExperimentRunning = true;
@@ -139,14 +123,12 @@ function startExperiment() {
     displayNumber();
 }
 
-// Fungsi untuk menghasilkan urutan angka
 function generateNumberSequence() {
-    let possibleNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => n !== noGoNumber);
-    let randomNumbers = [];
+    const possibleNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => n !== noGoNumber);
+    const randomNumbers = [];
 
     for (let i = 0; i < trialsPerSession - noGoCountPerSession; i++) {
-        let randomIndex = Math.floor(Math.random() * possibleNumbers.length);
-        randomNumbers.push(possibleNumbers[randomIndex]);
+        randomNumbers.push(possibleNumbers[Math.floor(Math.random() * possibleNumbers.length)]);
     }
 
     for (let i = 0; i < noGoCountPerSession; i++) {
@@ -156,7 +138,6 @@ function generateNumberSequence() {
     numberSequence = randomNumbers.sort(() => Math.random() - 0.5);
 }
 
-// Fungsi untuk menampilkan angka
 function displayNumber() {
     if (trialCount >= trialsPerSession) {
         endExperiment();
@@ -166,7 +147,7 @@ function displayNumber() {
     clearTimeout(timeoutId1);
     clearTimeout(timeoutId2);
 
-    let currentNumber = numberSequence[trialCount];
+    const currentNumber = numberSequence[trialCount];
     document.getElementById('number-display').textContent = currentNumber;
     userResponded = false;
     allowResponse = true;
@@ -189,23 +170,42 @@ function displayNumber() {
         if (!userResponded) {
             if (currentNumber !== noGoNumber) {
                 goMistakes++;
-                responses.push({ number: currentNumber, responseTime: null, correct: false, timestamp: getLocalTimestamp() });
+                responses.push({ 
+                    number: currentNumber, 
+                    responseTime: null, 
+                    correct: false, 
+                    timestamp: getLocalTimestamp() 
+                });
                 document.getElementById('feedback').textContent = '❌ Incorrect! You missed the response.';
-
-                timeoutId2 = setTimeout(() => {
-                    trialCount++;
-                    displayNumber();
-                }, incorrectDelayDuration);
             } else {
-                responses.push({ number: currentNumber, responseTime: null, correct: true, timestamp: getLocalTimestamp() });
-                trialCount++;
-                displayNumber();
+                responses.push({ 
+                    number: currentNumber, 
+                    responseTime: null, 
+                    correct: true, 
+                    timestamp: getLocalTimestamp() 
+                });
             }
+            proceedToNextTrial();
         }
     }, numberToDotDuration + delayBeforeNextNumber);
 }
 
-// Fungsi untuk menangani respons user
+function proceedToNextTrial() {
+    trialCount++;
+    
+    // Check if we should show a probe
+    if (remainingProbes > 0 && trialCount < trialsPerSession) {
+        const probeProbability = remainingProbes / (trialsPerSession - trialCount);
+        if (Math.random() < probeProbability) {
+            setTimeout(showProbe, 500);
+            return;
+        }
+    }
+    
+    // Continue with next trial
+    displayNumber();
+}
+
 function checkResponse(number) {
     if (!allowResponse || userResponded) return;
     userResponded = true;
@@ -214,61 +214,57 @@ function checkResponse(number) {
     clearTimeout(timeoutId1);
     clearTimeout(timeoutId2);
 
-    let responseTime = new Date().getTime() - startTime;
-    let timestamp = getLocalTimestamp();
+    const responseTime = new Date().getTime() - startTime;
+    const timestamp = getLocalTimestamp();
 
     document.getElementById('number-display').textContent = '●';
 
     if (number !== noGoNumber) {
         document.getElementById('feedback').textContent = '✅';
-        responses.push({ number, responseTime, correct: true, timestamp });
+        responses.push({ 
+            number, 
+            responseTime, 
+            correct: true, 
+            timestamp 
+        });
     } else {
         noGoMistakes++;
         document.getElementById('feedback').textContent = '❌ Incorrect! You should not have pressed the spacebar.';
-        responses.push({ number, responseTime, correct: false, timestamp });
-
-        timeoutId2 = setTimeout(() => {
-            trialCount++;
-            displayNumber();
-        }, incorrectDelayDuration);
+        responses.push({ 
+            number, 
+            responseTime, 
+            correct: false, 
+            timestamp 
+        });
     }
 
-    let remainingTime = Math.max(0, numberToDotDuration + delayBeforeNextNumber - responseTime);
-
-    if (number !== noGoNumber) {
-        // Trigger probe secara random setelah respon
-        if (remainingProbes > 0 && Math.random() < (remainingProbes / (trialsPerSession - trialCount))) {
-            setTimeout(showProbe, 500);
-            return; // Skip timeout karena akan dihandle oleh probe
-        }
-
-        timeoutId2 = setTimeout(() => {
-            trialCount++;
-            displayNumber();
-        }, remainingTime);
-    }
+    setTimeout(() => {
+        proceedToNextTrial();
+    }, 500);
 }
 
-// Mendeteksi penekanan tombol spasi
 document.addEventListener('keyup', (event) => {
     if (event.code === 'Space' && isExperimentRunning && allowResponse && !probeActive) {
         checkResponse(numberSequence[trialCount]);
     }
 });
 
-// Fungsi untuk mengakhiri eksperimen
 function endExperiment() {
     document.getElementById('number-display').textContent = '';
     document.getElementById('feedback').textContent = 'Loading Your Test Result...';
 
     localStorage.setItem('sartResults', JSON.stringify({
-        goTrials, goMistakes, noGoTrials, noGoMistakes, responses,
-        probeCount, probeResponses
+        goTrials, 
+        goMistakes, 
+        noGoTrials, 
+        noGoMistakes, 
+        responses,
+        probeCount, 
+        probeResponses
     }));
 
     window.location.href = "results.html";
     isExperimentRunning = false;
 }
 
-// Mulai eksperimen
 startExperiment();

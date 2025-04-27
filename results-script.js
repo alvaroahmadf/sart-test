@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    const results = JSON.parse(storedData);
+    
     // Check if in demo mode
     const isDemo = localStorage.getItem('demoMode') === 'true';
     
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Generate and download CSV only if not in demo mode
-        generateAndDownloadCSV(userData, JSON.parse(storedData).responses);
+        generateAndDownloadCSV(userData, results.responses);
     } else {
         // For demo mode, show different thank you message
         document.getElementById('thankYouMessage').innerHTML = `
@@ -31,17 +33,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Set up show results button
-    document.getElementById("showResultsLink").addEventListener("click", function() {
+    document.getElementById("showResultsLink")?.addEventListener("click", function() {
         document.getElementById("thankYouMessage").style.display = "none";
         document.getElementById("resultsContainer").style.display = "flex";
         
         // Process and display results
-        displayResults(JSON.parse(storedData));
+        displayResults(results);
     });
 });
 
 function displayResults(results) {
-    let { goTrials, goMistakes, noGoTrials, noGoMistakes, responses } = results;
+    let { goTrials, goMistakes, noGoTrials, noGoMistakes, responses, probeCount, probeResponses } = results;
     
     document.getElementById("go-trials").textContent = goTrials || 0;
     document.getElementById("go-mistakes").textContent = goMistakes || 0;
@@ -53,19 +55,32 @@ function displayResults(results) {
     document.getElementById("no-go-mistake-percentage").textContent =
         noGoTrials ? ((noGoMistakes / noGoTrials) * 100).toFixed(0) + " %" : "0 %";
 
-    if (results.probeCount > 0) {
-        const yesCount = results.probeResponses.filter(r => r === 1).length;
-        const noCount = results.probeResponses.filter(r => r === 2).length;
+    // Create results section container
+    const resultsSection = document.querySelector('.results-section');
+    
+    // Add probe results if they exist
+    if (probeCount > 0 && probeResponses) {
+        const yesCount = probeResponses.filter(r => r === 1).length;
+        const noCount = probeResponses.filter(r => r === 2).length;
         
         const probeHTML = `
-            <p><strong>Number of Probe:</strong> ${results.probeCount}</p>
-            <p><strong>Number of Yes Probe:</strong> ${yesCount}</p>
-            <p><strong>Number of No Probe:</strong> ${noCount}</p>
+            <div class="probe-results">
+                <p><strong>Number of Probe:</strong> ${probeCount}</p>
+                <p><strong>Number of Yes Probe:</strong> ${yesCount}</p>
+                <p><strong>Number of No Probe:</strong> ${noCount}</p>
+            </div>
         `;
         
-        document.querySelector('.results-section').insertAdjacentHTML('beforeend', probeHTML);
+        // Insert probe results before the back button
+        const backButton = resultsSection.querySelector('.back-link');
+        if (backButton) {
+            backButton.insertAdjacentHTML('beforebegin', probeHTML);
+        } else {
+            resultsSection.insertAdjacentHTML('beforeend', probeHTML);
+        }
     }
 
+    // Populate response table
     let tableBody = document.getElementById("responseTableBody");
     tableBody.innerHTML = ""; // Clear existing rows
     responses.forEach((response, index) => {
