@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
             noGoNumber: parseInt(document.getElementById('noGoNumber').value),
             delayBeforeNextNumber: parseInt(document.getElementById('delayBeforeNextNumber').value),
             numberToDotDuration: parseInt(document.getElementById('numberToDotDuration').value),
-            incorrectDelayDuration: parseInt(document.getElementById('incorrectDelayDuration').value)
+            incorrectDelayDuration: parseInt(document.getElementById('incorrectDelayDuration').value),
+            probeCount: parseInt(document.getElementById('probeCount').value)
         };
         localStorage.setItem('testSettings', JSON.stringify(settings));
         alert('Settings saved successfully!');

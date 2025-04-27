@@ -53,6 +53,19 @@ function displayResults(results) {
     document.getElementById("no-go-mistake-percentage").textContent =
         noGoTrials ? ((noGoMistakes / noGoTrials) * 100).toFixed(0) + " %" : "0 %";
 
+    if (results.probeCount > 0) {
+        const yesCount = results.probeResponses.filter(r => r === 1).length;
+        const noCount = results.probeResponses.filter(r => r === 2).length;
+        
+        const probeHTML = `
+            <p><strong>Number of Probe:</strong> ${results.probeCount}</p>
+            <p><strong>Number of Yes Probe:</strong> ${yesCount}</p>
+            <p><strong>Number of No Probe:</strong> ${noCount}</p>
+        `;
+        
+        document.querySelector('.results-section').insertAdjacentHTML('beforeend', probeHTML);
+    }
+
     let tableBody = document.getElementById("responseTableBody");
     tableBody.innerHTML = ""; // Clear existing rows
     responses.forEach((response, index) => {

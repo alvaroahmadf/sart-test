@@ -269,3 +269,26 @@ tr:hover {
     background-color: #6c757d;
     color: #fff;
 }
+
+/* Probe */
+#probeModal div {
+    max-width: 400px;
+    margin: 0 auto;
+    color: white;
+}
+
+#probeModal h2 {
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+#probeModal p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#probeResponse {
+    color: #ffc107;
+    font-weight: bold;
+    font-size: 20px;
+}

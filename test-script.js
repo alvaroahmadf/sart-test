@@ -8,7 +8,8 @@ const settings = JSON.parse(localStorage.getItem('testSettings')) || {
     noGoNumber: 3,
     delayBeforeNextNumber: 900,
     numberToDotDuration: 250,
-    incorrectDelayDuration: 3000
+    incorrectDelayDuration: 3000,
+    probeCount: 0 // Default probe nonaktif
 };
 
 // Konfigurasi Eksperimen
@@ -18,6 +19,7 @@ let noGoNumber = settings.noGoNumber;
 let delayBeforeNextNumber = settings.delayBeforeNextNumber;
 let numberToDotDuration = settings.numberToDotDuration;
 let incorrectDelayDuration = settings.incorrectDelayDuration;
+let probeCount = settings.probeCount || 0; // Jumlah probe
 
 // Variabel Eksperimen
 let trialCount = 0;
@@ -34,6 +36,11 @@ let startTime = 0;
 let timeoutId1 = null;
 let timeoutId2 = null;
 
+// Variabel Probe
+let probeResponses = [];
+let remainingProbes = probeCount;
+let probeActive = false;
+
 function getLocalTimestamp() {
     let now = new Date();
     let options = { timeZone: "Asia/Jakarta" };
@@ -49,6 +56,73 @@ function getLocalTimestamp() {
     return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
 }
 
+// Fungsi untuk menampilkan probe
+function showProbe() {
+    if (probeActive || remainingProbes <= 0) return;
+    
+    probeActive = true;
+    allowResponse = false;
+    clearTimeout(timeoutId1);
+    clearTimeout(timeoutId2);
+    
+    const probeModal = document.createElement('div');
+    probeModal.id = 'probeModal';
+    probeModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    probeModal.innerHTML = `
+        <div style="background-color: #1a1a1a; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px;">
+            <h2 style="color: #28a745; margin-bottom: 15px;">Apakah Anda masih fokus?</h2>
+            <p style="font-size: 18px; margin-bottom: 20px;">Tekan 1 untuk Ya, 2 untuk Tidak</p>
+            <div id="probeResponse" style="margin-top: 20px; color: #ffc107; font-weight: bold; font-size: 20px;"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(probeModal);
+}
+
+// Fungsi untuk menangani respon probe
+function handleProbeResponse(response) {
+    const responseText = response === 1 ? 'Ya' : 'Tidak';
+    probeResponses.push(response);
+    remainingProbes--;
+    
+    document.getElementById('probeResponse').textContent = `Anda menjawab: ${responseText}`;
+    
+    setTimeout(() => {
+        const probeModal = document.getElementById('probeModal');
+        if (probeModal) {
+            probeModal.remove();
+        }
+        probeActive = false;
+        allowResponse = true;
+        displayNumber(); // Lanjutkan test
+    }, 1000);
+}
+
+// Event listener untuk probe
+document.addEventListener('keydown', (e) => {
+    if (!probeActive) return;
+    
+    if (e.key === '1') {
+        handleProbeResponse(1);
+        e.preventDefault();
+    } else if (e.key === '2') {
+        handleProbeResponse(2);
+        e.preventDefault();
+    }
+});
+
 // Fungsi untuk memulai eksperimen
 function startExperiment() {
     document.getElementById('feedback').textContent = '';
@@ -59,6 +133,8 @@ function startExperiment() {
     goMistakes = 0;
     noGoTrials = 0;
     noGoMistakes = 0;
+    remainingProbes = probeCount;
+    probeResponses = [];
     generateNumberSequence();
     displayNumber();
 }
@@ -160,6 +236,12 @@ function checkResponse(number) {
     let remainingTime = Math.max(0, numberToDotDuration + delayBeforeNextNumber - responseTime);
 
     if (number !== noGoNumber) {
+        // Trigger probe secara random setelah respon
+        if (remainingProbes > 0 && Math.random() < (remainingProbes / (trialsPerSession - trialCount))) {
+            setTimeout(showProbe, 500);
+            return; // Skip timeout karena akan dihandle oleh probe
+        }
+
         timeoutId2 = setTimeout(() => {
             trialCount++;
             displayNumber();
@@ -169,7 +251,7 @@ function checkResponse(number) {
 
 // Mendeteksi penekanan tombol spasi
 document.addEventListener('keyup', (event) => {
-    if (event.code === 'Space' && isExperimentRunning && allowResponse) {
+    if (event.code === 'Space' && isExperimentRunning && allowResponse && !probeActive) {
         checkResponse(numberSequence[trialCount]);
     }
 });
@@ -180,7 +262,8 @@ function endExperiment() {
     document.getElementById('feedback').textContent = 'Loading Your Test Result...';
 
     localStorage.setItem('sartResults', JSON.stringify({
-        goTrials, goMistakes, noGoTrials, noGoMistakes, responses
+        goTrials, goMistakes, noGoTrials, noGoMistakes, responses,
+        probeCount, probeResponses
     }));
 
     window.location.href = "results.html";
