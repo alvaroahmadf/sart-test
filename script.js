@@ -12,36 +12,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
 
     // Demo button handler - revisi
-    document.getElementById('demoBtn').addEventListener('click', () => {
-        const modal = document.getElementById('userModal');
-        modal.classList.remove('show');
+document.getElementById('demoBtn').addEventListener('click', () => {
+    const modal = document.getElementById('userModal');
+    modal.classList.remove('show');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        localStorage.setItem('demoMode', 'true');
         
-        setTimeout(() => {
-            modal.style.display = 'none';
-            localStorage.setItem('demoMode', 'true');
+        // Default enable probe in demo mode
+        const enableProbe = true;
+        
+        localStorage.setItem('testSettings', JSON.stringify({
+            trialsPerSession: 18,
+            noGoCountPerSession: 2,
+            noGoNumber: 3,
+            delayBeforeNextNumber: 900,
+            numberToDotDuration: 250,
+            incorrectDelayDuration: 3000,
+            probeCount: enableProbe ? 4 : 0
+        }));
+        
+        // Update instructions for demo mode with ALWAYS VISIBLE probe toggle
+        document.getElementById('app').innerHTML = `
+            <h1>SART Test (Demo)</h1>
+            <h2>Instruksi</h2>
+            <p>Dalam percobaan ini, Anda akan disajikan dengan angka 1 hingga 9 di bagian tengah layar.</p>
+            <p>Tugas Anda adalah menekan SPASI sebagai respons terhadap setiap angka, kecuali bila angka tersebut adalah '3'.</p>
+            <p>Setiap angka diikuti oleh lingkaran, yang dapat Anda abaikan.</p>
+            
+            <h3>Tekan SPACEBAR untuk memulai hitungan mundur.</h3>
+
+            <div class="probe-toggle-container">
+                <label class="probe-toggle-label">Aktifkan Probe:</label>
+                <label class="probe-switch">
+                    <input type="checkbox" id="probeToggle" checked>
+                    <span class="probe-slider"></span>
+                </label>
+            </div>
+
+            <div id="countdown"></div>
+            <div id="number-display"></div>
+            <div id="feedback"></div>
+        `;
+        
+        // Add event listener for the probe toggle
+        document.getElementById('probeToggle').addEventListener('change', function() {
+            const enableProbe = this.checked;
             localStorage.setItem('testSettings', JSON.stringify({
                 trialsPerSession: 18,
                 noGoCountPerSession: 2,
                 noGoNumber: 3,
                 delayBeforeNextNumber: 900,
                 numberToDotDuration: 250,
-                incorrectDelayDuration: 3000
+                incorrectDelayDuration: 3000,
+                probeCount: enableProbe ? 4 : 0
             }));
-            
-            // Update instructions for demo mode
-            document.getElementById('app').innerHTML = `
-                <h1>SART Test (Demo)</h1>
-                <h2>Instruksi</h2>
-                <p>Dalam percobaan ini, Anda akan disajikan dengan angka 1 hingga 9 di bagian tengah layar.</p>
-                <p>Tugas Anda adalah menekan SPASI sebagai respons terhadap setiap angka, kecuali bila angka tersebut adalah '3'.</p>
-                <p>Setiap angka diikuti oleh lingkaran, yang dapat Anda abaikan.</p>
-                <h3>Tekan SPACEBAR untuk memulai hitungan mundur.</h3>
-                <div id="countdown"></div>
-                <div id="number-display"></div>
-                <div id="feedback"></div>
-            `;
-        }, 300);
-    });
+        });
+    }, 300);
+});
 
     // Settings button handler
     document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -125,3 +154,19 @@ function startCountdown() {
         }
     }, 1000);
 }
+
+// Tampilkan toggle probe saat hover demo button
+document.getElementById('demoBtn').addEventListener('mouseover', () => {
+    document.getElementById('demoProbeContainer').style.display = 'flex';
+});
+
+document.getElementById('demoBtn').addEventListener('mouseout', () => {
+    // Sembunyikan jika tidak sedang hover ke toggle container
+    if (!document.getElementById('demoProbeContainer').matches(':hover')) {
+        document.getElementById('demoProbeContainer').style.display = 'none';
+    }
+});
+
+document.getElementById('demoProbeContainer').addEventListener('mouseout', () => {
+    document.getElementById('demoProbeContainer').style.display = 'none';
+});

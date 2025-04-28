@@ -297,3 +297,69 @@ tr:hover {
     margin: 12px 0;
     margin-top: 5px;
 }
+
+/* Probe Toggle Styles for Demo Instructions */
+.probe-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px 0;
+    padding: 15px;
+    /* background-color: #2a2a2a; */
+    border-radius: 8px;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.probe-toggle-label {
+    margin-right: 15px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.probe-switch {
+    position: relative;
+    display: inline-block;
+    width: 70px;
+    height: 38px;
+}
+
+.probe-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.probe-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.probe-slider:before {
+    position: absolute;
+    content: "";
+    height: 30px;
+    width: 30px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.probe-switch input:checked + .probe-slider {
+    background-color: #28a745;
+}
+
+.probe-switch input:checked + .probe-slider:before {
+    transform: translateX(32px);
+}

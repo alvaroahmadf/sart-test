@@ -177,6 +177,12 @@ function displayNumber() {
                     timestamp: getLocalTimestamp() 
                 });
                 document.getElementById('feedback').textContent = '❌ Incorrect! You missed the response.';
+                
+                // Add delay for missed Go trials
+                setTimeout(() => {
+                    trialCount++;
+                    proceedToNextTrial();
+                }, incorrectDelayDuration);
             } else {
                 responses.push({ 
                     number: currentNumber, 
@@ -184,15 +190,14 @@ function displayNumber() {
                     correct: true, 
                     timestamp: getLocalTimestamp() 
                 });
+                trialCount++;
+                proceedToNextTrial();
             }
-            proceedToNextTrial();
         }
     }, numberToDotDuration + delayBeforeNextNumber);
 }
 
 function proceedToNextTrial() {
-    trialCount++;
-    
     // Check if we should show a probe
     if (remainingProbes > 0 && trialCount < trialsPerSession) {
         const probeProbability = remainingProbes / (trialsPerSession - trialCount);
@@ -207,7 +212,7 @@ function proceedToNextTrial() {
 }
 
 function checkResponse(number) {
-    if (!allowResponse || userResponded) return;
+    if (!allowResponse || userResponded || probeActive) return;
     userResponded = true;
     allowResponse = false;
 
@@ -227,6 +232,12 @@ function checkResponse(number) {
             correct: true, 
             timestamp 
         });
+        
+        // Proceed to next trial after short delay for correct Go response
+        setTimeout(() => {
+            trialCount++;
+            proceedToNextTrial();
+        }, 500);
     } else {
         noGoMistakes++;
         document.getElementById('feedback').textContent = '❌ Incorrect! You should not have pressed the spacebar.';
@@ -236,15 +247,17 @@ function checkResponse(number) {
             correct: false, 
             timestamp 
         });
+        
+        // Add longer delay for No-Go mistakes
+        setTimeout(() => {
+            trialCount++;
+            proceedToNextTrial();
+        }, incorrectDelayDuration);
     }
-
-    setTimeout(() => {
-        proceedToNextTrial();
-    }, 500);
 }
 
 document.addEventListener('keyup', (event) => {
-    if (event.code === 'Space' && isExperimentRunning && allowResponse && !probeActive) {
+    if (event.code === 'Space' && isExperimentRunning && !probeActive) {
         checkResponse(numberSequence[trialCount]);
     }
 });
