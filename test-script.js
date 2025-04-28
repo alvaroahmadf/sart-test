@@ -162,7 +162,7 @@ function displayNumber() {
     }
 
     timeoutId1 = setTimeout(() => {
-        document.getElementById('number-display').textContent = '●';
+        document.getElementById('number-display').textContent = '⚪';
     }, numberToDotDuration);
 
     timeoutId2 = setTimeout(() => {
@@ -222,10 +222,10 @@ function checkResponse(number) {
     const responseTime = new Date().getTime() - startTime;
     const timestamp = getLocalTimestamp();
 
-    document.getElementById('number-display').textContent = '●';
+    document.getElementById('number-display').textContent = '🟢';
 
     if (number !== noGoNumber) {
-        document.getElementById('feedback').textContent = '✅';
+        document.getElementById('feedback').textContent = '';
         responses.push({ 
             number, 
             responseTime, 

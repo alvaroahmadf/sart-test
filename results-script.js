@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <h2>Demo Selesai!</h2>
             <div class="action-links">
                 <a href="index.html" class="back-link">Kembali ke Halaman Awal</a>
-                <span id="showResultsLink" class="show-results-link">Perlihatkan Hasil Tes Demo</span>
+                <span id="showResultsLink" class="show-results-link">_</span>
             </div>
         `;
     }
