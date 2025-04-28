@@ -133,6 +133,10 @@ tr:hover {
     transition: opacity 0.3s ease-in-out;
 }
 
+#settingsModal {
+    margin: -7% auto;
+}
+
 .modal.show {
     opacity: 1;
 }
@@ -258,6 +262,14 @@ tr:hover {
 #settingsBtn {
     background-color: #17a2b8;
     color: #fff;
+    flex: 0 0 40px;
+    padding: 10px 0;
+    width: auto;
+    background-image: url('assets/settings-icon.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px; /* Sesuaikan ukuran */
+    text-indent: -9999px; /* Menyembunyikan teks alternatif */
 }
 
 #saveSettings {
