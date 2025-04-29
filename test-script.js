@@ -222,7 +222,11 @@ function checkResponse(number) {
     const responseTime = new Date().getTime() - startTime;
     const timestamp = getLocalTimestamp();
 
-    document.getElementById('number-display').textContent = '🟢';
+    if (number == noGoNumber){
+        document.getElementById('number-display').textContent = '🔴';
+    } else {
+        document.getElementById('number-display').textContent = '🟢';
+    }
 
     if (number !== noGoNumber) {
         document.getElementById('feedback').textContent = '';
