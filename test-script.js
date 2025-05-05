@@ -176,7 +176,8 @@ function displayNumber() {
                     correct: false, 
                     timestamp: getLocalTimestamp() 
                 });
-                document.getElementById('feedback').textContent = '❌ Incorrect! You missed the response.';
+                document.getElementById('number-display').textContent = '🔴';
+                document.getElementById('feedback').textContent = '❌ Tidak tepat! Anda melewatkan responsnya.';
                 
                 // Add delay for missed Go trials
                 setTimeout(() => {
@@ -244,7 +245,7 @@ function checkResponse(number) {
         }, 500);
     } else {
         noGoMistakes++;
-        document.getElementById('feedback').textContent = '❌ Incorrect! You should not have pressed the spacebar.';
+        document.getElementById('feedback').textContent = '❌ Tidak tepat! Anda seharusnya tidak menekan tombol spasi.';
         responses.push({ 
             number, 
             responseTime, 

@@ -41,7 +41,7 @@ document.getElementById('demoBtn').addEventListener('click', () => {
             <p>Tugas Anda adalah menekan SPASI sebagai respons terhadap setiap angka, kecuali bila angka tersebut adalah '3'.</p>
             <p>Setiap angka diikuti oleh lingkaran, yang dapat Anda abaikan.</p>
             
-            <h3>Tekan SPACEBAR untuk memulai hitungan mundur.</h3>
+            <h3>Tekan SPASI untuk memulai hitungan mundur.</h3>
 
             <div class="probe-toggle-container">
                 <label class="probe-toggle-label">Aktifkan Probe:</label>
@@ -146,7 +146,7 @@ function startCountdown() {
     `;
     countdownInterval = setInterval(() => {
         if (countdownValue > 0) {
-            document.getElementById('countdown').textContent = `Get Ready!  \n${countdownValue}`;
+            document.getElementById('countdown').textContent = `Bersiap!  \n${countdownValue}`;
             countdownValue--;
         } else {
             clearInterval(countdownInterval);
