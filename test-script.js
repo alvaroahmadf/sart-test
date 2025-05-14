@@ -35,6 +35,7 @@ let numberSequence = [];
 let startTime = 0;
 let timeoutId1 = null;
 let timeoutId2 = null;
+let isSpacePressed = false; // Flag baru untuk melacak status spacebar
 
 // Probe Variables
 let probeResponses = [];
@@ -97,14 +98,19 @@ function handleProbeResponse(response) {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (!probeActive) return;
+    if (probeActive) {
+        if (e.key === '1') {
+            handleProbeResponse(1);
+            e.preventDefault();
+        } else if (e.key === '2') {
+            handleProbeResponse(2);
+            e.preventDefault();
+        }
+        return;
+    }
     
-    if (e.key === '1') {
-        handleProbeResponse(1);
-        e.preventDefault();
-    } else if (e.key === '2') {
-        handleProbeResponse(2);
-        e.preventDefault();
+    if (e.code === 'Space' && isExperimentRunning && !probeActive) {
+        checkResponse(numberSequence[trialCount]);
     }
 });
 
@@ -213,7 +219,8 @@ function proceedToNextTrial() {
 }
 
 function checkResponse(number) {
-    if (!allowResponse || userResponded || probeActive) return;
+    if (!allowResponse || userResponded || probeActive || isSpacePressed) return; // Tambah pengecekan isSpacePressed
+    isSpacePressed = true; // Set flag saat space ditekan
     userResponded = true;
     allowResponse = false;
 
@@ -238,7 +245,6 @@ function checkResponse(number) {
             timestamp 
         });
         
-        // Proceed to next trial after short delay for correct Go response
         setTimeout(() => {
             trialCount++;
             proceedToNextTrial();
@@ -253,7 +259,6 @@ function checkResponse(number) {
             timestamp 
         });
         
-        // Add longer delay for No-Go mistakes
         setTimeout(() => {
             trialCount++;
             proceedToNextTrial();
@@ -261,9 +266,27 @@ function checkResponse(number) {
     }
 }
 
-document.addEventListener('keyup', (event) => {
-    if (event.code === 'Space' && isExperimentRunning && !probeActive) {
+// Event listener untuk keydown dan keyup
+document.addEventListener('keydown', (e) => {
+    if (probeActive) {
+        if (e.code === 'Digit1') {
+            handleProbeResponse(1);
+            e.preventDefault();
+        } else if (e.code === 'Digit2') {
+            handleProbeResponse(2);
+            e.preventDefault();
+        }
+        return;
+    }
+    
+    if (e.code === 'Space' && isExperimentRunning && !probeActive && !isSpacePressed) {
         checkResponse(numberSequence[trialCount]);
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+        isSpacePressed = false; // Reset flag saat space dilepas
     }
 });
 
