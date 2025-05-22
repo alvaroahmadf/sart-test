@@ -66,8 +66,8 @@ function displayResults(results) {
         const probeHTML = `
             <div class="probe-results">
                 <p><strong>Number of Probe:</strong> ${probeCount}</p>
-                <p><strong>Number of Yes Probe:</strong> ${yesCount}</p>
-                <p><strong>Number of No Probe:</strong> ${noCount}</p>
+                <p><strong>Number of "Fokus" Probe:</strong> ${yesCount}</p>
+                <p><strong>Number of "MW" Probe:</strong> ${noCount}</p>
             </div>
         `;
         

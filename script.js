@@ -4,13 +4,13 @@ let isModalOpen = true;
 
 // Default settings
 const DEFAULT_SETTINGS = {
-    trialsPerSession: 1600,
-    noGoCountPerSession: 190,
+    trialsPerSession: 900,
+    noGoCountPerSession: 225,
     noGoNumber: 3,
     delayBeforeNextNumber: 900,
     numberToDotDuration: 250,
     incorrectDelayDuration: 3000,
-    probeCount: 0
+    probeCount: 40
 };
 
 const DEMO_SETTINGS = {

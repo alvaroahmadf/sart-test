@@ -15,13 +15,13 @@ if (isDemo) {
     };
 } else {
     settings = JSON.parse(localStorage.getItem('userSettings')) || {
-        trialsPerSession: 1600,
-        noGoCountPerSession: 190,
+        trialsPerSession: 900,
+        noGoCountPerSession: 225,
         noGoNumber: 3,
         delayBeforeNextNumber: 900,
         numberToDotDuration: 250,
         incorrectDelayDuration: 3000,
-        probeCount: 0
+        probeCount: 40
     };
 }
 
@@ -86,8 +86,8 @@ function showProbe() {
     
     probeModal.innerHTML = `
         <div style="background-color: #1a1a1a; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px;">
-            <h2 style="color: #28a745; margin-bottom: 15px;">Apakah Anda masih fokus?</h2>
-            <p style="font-size: 18px; margin-bottom: 20px;">Tekan 1 untuk Ya, 2 untuk Tidak</p>
+            <h2 style="color: #28a745; margin-bottom: 15px;">Pernyataan mana yang paling menggambarkan kondisi mental anda sebelum layar ini muncul??</h2>
+            <p style="font-size: 18px; margin-bottom: 20px;">Tekan 1: Fokus pada tugas, Tekan 2: Mind wandering</p>
             <div id="probeResponse" style="margin-top: 20px; color: #ffc107; font-weight: bold; font-size: 20px;"></div>
         </div>
     `;
@@ -96,7 +96,7 @@ function showProbe() {
 }
 
 function handleProbeResponse(response) {
-    const responseText = response === 1 ? 'Ya' : 'Tidak';
+    const responseText = response === 1 ? 'Fokus' : 'Mind wandering';
     probeResponses.push(response);
     remainingProbes--;
     
