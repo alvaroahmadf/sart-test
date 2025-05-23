@@ -1,56 +1,11 @@
 let countdownValue = 3;
 let countdownInterval;
-let isModalOpen = true;
-
-// Default settings
-const DEFAULT_SETTINGS = {
-    trialsPerSession: 900,
-    noGoCountPerSession: 225,
-    noGoNumber: 3,
-    delayBeforeNextNumber: 900,
-    numberToDotDuration: 250,
-    incorrectDelayDuration: 3000,
-    probeCount: 40
-};
-
-const DEMO_SETTINGS = {
-    trialsPerSession: 18,
-    noGoCountPerSession: 2,
-    noGoNumber: 3,
-    delayBeforeNextNumber: 900,
-    numberToDotDuration: 250,
-    incorrectDelayDuration: 3000,
-    probeCount: 4
-};
-
-// Initialize settings
-function initSettings() {
-    if (!localStorage.getItem('userSettings')) {
-        localStorage.setItem('userSettings', JSON.stringify(DEFAULT_SETTINGS));
-    }
-}
 
 // Show modal when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    initSettings();
-    
-    // Load current settings
-    const currentSettings = JSON.parse(localStorage.getItem('userSettings')) || DEFAULT_SETTINGS;
-
-    // Populate settings form
-    document.getElementById('trialsPerSession').value = currentSettings.trialsPerSession;
-    document.getElementById('noGoCountPerSession').value = currentSettings.noGoCountPerSession;
-    document.getElementById('noGoNumber').value = currentSettings.noGoNumber;
-    document.getElementById('delayBeforeNextNumber').value = currentSettings.delayBeforeNextNumber;
-    document.getElementById('numberToDotDuration').value = currentSettings.numberToDotDuration;
-    document.getElementById('incorrectDelayDuration').value = currentSettings.incorrectDelayDuration;
-    document.getElementById('probeCount').value = currentSettings.probeCount;
-
-    // Show user modal
     setTimeout(() => {
         const modal = document.getElementById('userModal');
         modal.style.display = 'block';
-        isModalOpen = true;
         setTimeout(() => {
             modal.classList.add('show');
         }, 10);
@@ -60,12 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('demoBtn').addEventListener('click', () => {
         const modal = document.getElementById('userModal');
         modal.classList.remove('show');
-        isModalOpen = false;
         
         setTimeout(() => {
             modal.style.display = 'none';
             localStorage.setItem('demoMode', 'true');
             
+            // Default enable probe in demo mode
+            const enableProbe = true;
+            
+            localStorage.setItem('testSettings', JSON.stringify({
+                trialsPerSession: 18,
+                noGoCountPerSession: 2,
+                noGoNumber: 3,
+                delayBeforeNextNumber: 900,
+                numberToDotDuration: 250,
+                incorrectDelayDuration: 3000,
+                probeCount: enableProbe ? 4 : 0
+            }));
+            
+            // Update instructions for demo mode with ALWAYS VISIBLE probe toggle
             document.getElementById('app').innerHTML = `
                 <h1>SART Test (Demo)</h1>
                 <h2>Instruksi</h2>
@@ -88,84 +56,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="feedback"></div>
             `;
             
+            // Add event listener for the probe toggle
             document.getElementById('probeToggle').addEventListener('change', function() {
-                const updatedSettings = JSON.parse(JSON.stringify(DEMO_SETTINGS));
-                updatedSettings.probeCount = this.checked ? 4 : 0;
-                localStorage.setItem('demoSettings', JSON.stringify(updatedSettings));
+                const enableProbe = this.checked;
+                localStorage.setItem('testSettings', JSON.stringify({
+                    trialsPerSession: 18,
+                    noGoCountPerSession: 2,
+                    noGoNumber: 3,
+                    delayBeforeNextNumber: 900,
+                    numberToDotDuration: 250,
+                    incorrectDelayDuration: 3000,
+                    probeCount: enableProbe ? 4 : 0
+                }));
             });
+
+            // Set up spacebar listener for demo mode
+            document.addEventListener('keydown', handleDemoSpacePress);
         }, 300);
     });
 
-    // Settings button handler
+    // Settings button handler (NEW - Added this section)
     document.getElementById('settingsBtn').addEventListener('click', () => {
         const userModal = document.getElementById('userModal');
         userModal.classList.remove('show');
-        isModalOpen = false;
-        
         setTimeout(() => {
             userModal.style.display = 'none';
             const settingsModal = document.getElementById('settingsModal');
-            
-            // Load current user settings
-            const currentSettings = JSON.parse(localStorage.getItem('userSettings')) || DEFAULT_SETTINGS;
-            
-            // Populate form
-            document.getElementById('trialsPerSession').value = currentSettings.trialsPerSession;
-            document.getElementById('noGoCountPerSession').value = currentSettings.noGoCountPerSession;
-            document.getElementById('noGoNumber').value = currentSettings.noGoNumber;
-            document.getElementById('delayBeforeNextNumber').value = currentSettings.delayBeforeNextNumber;
-            document.getElementById('numberToDotDuration').value = currentSettings.numberToDotDuration;
-            document.getElementById('incorrectDelayDuration').value = currentSettings.incorrectDelayDuration;
-            document.getElementById('probeCount').value = currentSettings.probeCount;
-            
             settingsModal.style.display = 'block';
             setTimeout(() => {
                 settingsModal.classList.add('show');
             }, 10);
+            
+            // Load current settings
+            const currentSettings = JSON.parse(localStorage.getItem('testSettings')) || {};
+            if (currentSettings.mindwonderingEnabled) {
+                toggleSettingsLock(true);
+            }
         }, 300);
     });
 
-    // Save settings button handler
+    // Back to form button handler (NEW - Added this section)
+    document.getElementById('backToForm').addEventListener('click', () => {
+        const settingsModal = document.getElementById('settingsModal');
+        settingsModal.classList.remove('show');
+        setTimeout(() => {
+            settingsModal.style.display = 'none';
+            const userModal = document.getElementById('userModal');
+            userModal.style.display = 'block';
+            setTimeout(() => {
+                userModal.classList.add('show');
+            }, 10);
+        }, 300);
+    });
+
+    // Function to toggle settings lock
+    function toggleSettingsLock(locked) {
+        const settingsFields = [
+            'trialsPerSession',
+            'noGoCountPerSession',
+            'noGoNumber',
+            'delayBeforeNextNumber',
+            'numberToDotDuration',
+            'incorrectDelayDuration',
+            'probeCount'
+        ];
+        
+        settingsFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (element) {
+                element.disabled = locked;
+                element.style.backgroundColor = locked ? '#555' : '';
+                element.style.cursor = locked ? 'not-allowed' : '';
+            }
+        });
+    }
+
+    // Mindwondering toggle change handler
+    document.getElementById('mindwonderingToggle').addEventListener('change', function() {
+    const isChecked = this.checked;
+    toggleSettingsLock(isChecked);
+    
+    if (isChecked) {
+        // Set default values for Mindwondering mode
+        document.getElementById('trialsPerSession').value = 900;
+        document.getElementById('noGoCountPerSession').value = 100;
+        document.getElementById('noGoNumber').value = 3;
+        document.getElementById('delayBeforeNextNumber').value = 900;
+        document.getElementById('numberToDotDuration').value = 250;
+        document.getElementById('incorrectDelayDuration').value = 3000;
+        document.getElementById('probeCount').value = Math.floor(900/45); // 20 probes (900/45)
+    }
+
+    
+});
+
+    // Save settings button handler (NEW - Added this section)
     document.getElementById('saveSettings').addEventListener('click', () => {
-        const newSettings = {
+        const settings = {
             trialsPerSession: parseInt(document.getElementById('trialsPerSession').value),
             noGoCountPerSession: parseInt(document.getElementById('noGoCountPerSession').value),
             noGoNumber: parseInt(document.getElementById('noGoNumber').value),
             delayBeforeNextNumber: parseInt(document.getElementById('delayBeforeNextNumber').value),
             numberToDotDuration: parseInt(document.getElementById('numberToDotDuration').value),
             incorrectDelayDuration: parseInt(document.getElementById('incorrectDelayDuration').value),
-            probeCount: parseInt(document.getElementById('probeCount').value)
+            probeCount: parseInt(document.getElementById('probeCount').value),
+            ndwonderingEnabled: document.getElementById('mindwonderingToggle').checked
         };
-        
-        localStorage.setItem('userSettings', JSON.stringify(newSettings));
+        localStorage.setItem('testSettings', JSON.stringify(settings));
         alert('Settings saved successfully!');
-        
-        // Close settings modal
-        document.getElementById('settingsModal').classList.remove('show');
-        setTimeout(() => {
-            document.getElementById('settingsModal').style.display = 'none';
-            document.getElementById('userModal').style.display = 'block';
-            isModalOpen = true;
-            setTimeout(() => {
-                document.getElementById('userModal').classList.add('show');
-            }, 10);
-        }, 300);
-    });
-
-    // Back to form button handler
-    document.getElementById('backToForm').addEventListener('click', () => {
-        const settingsModal = document.getElementById('settingsModal');
-        settingsModal.classList.remove('show');
-        
-        setTimeout(() => {
-            settingsModal.style.display = 'none';
-            const userModal = document.getElementById('userModal');
-            userModal.style.display = 'block';
-            isModalOpen = true;
-            setTimeout(() => {
-                userModal.classList.add('show');
-            }, 10);
-        }, 300);
     });
 });
 
@@ -174,7 +172,6 @@ document.getElementById('userForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const modal = document.getElementById('userModal');
     modal.classList.remove('show');
-    isModalOpen = false;
     
     setTimeout(() => {
         modal.style.display = 'none';
@@ -187,15 +184,28 @@ document.getElementById('userForm').addEventListener('submit', (e) => {
     }, 300);
 });
 
-// Modified spacebar handler
+// Start countdown when space is pressed ONLY if modal is not showing
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'Space') {
-        if (isModalOpen) return;
-        if (countdownValue === 3) {
-            startCountdown();
-        }
+    const userModal = document.getElementById('userModal');
+    const settingsModal = document.getElementById('settingsModal');
+    
+    if (event.code === 'Space' && 
+        countdownValue === 3 && 
+        userModal.style.display === 'none' && 
+        settingsModal.style.display === 'none' &&
+        localStorage.getItem('demoMode') !== 'true') {
+        startCountdown();
     }
 });
+
+// Special handler for spacebar in demo mode
+function handleDemoSpacePress(event) {
+    if (event.code === 'Space' && countdownValue === 3) {
+        // Remove this listener to prevent multiple triggers
+        document.removeEventListener('keydown', handleDemoSpacePress);
+        startCountdown();
+    }
+}
 
 function startCountdown() {
     document.getElementById('app').innerHTML = `
@@ -218,6 +228,7 @@ document.getElementById('demoBtn').addEventListener('mouseover', () => {
 });
 
 document.getElementById('demoBtn').addEventListener('mouseout', () => {
+    // Sembunyikan jika tidak sedang hover ke toggle container
     if (!document.getElementById('demoProbeContainer').matches(':hover')) {
         document.getElementById('demoProbeContainer').style.display = 'none';
     }

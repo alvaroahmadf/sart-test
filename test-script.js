@@ -1,38 +1,25 @@
-// Check demo mode
+// Check demo mode first
 const isDemo = localStorage.getItem('demoMode') === 'true';
 
-// Load settings
-let settings;
-if (isDemo) {
-    settings = JSON.parse(localStorage.getItem('demoSettings')) || {
-        trialsPerSession: 18,
-        noGoCountPerSession: 2,
-        noGoNumber: 3,
-        delayBeforeNextNumber: 900,
-        numberToDotDuration: 250,
-        incorrectDelayDuration: 3000,
-        probeCount: 4
-    };
-} else {
-    settings = JSON.parse(localStorage.getItem('userSettings')) || {
-        trialsPerSession: 900,
-        noGoCountPerSession: 225,
-        noGoNumber: 3,
-        delayBeforeNextNumber: 900,
-        numberToDotDuration: 250,
-        incorrectDelayDuration: 3000,
-        probeCount: 40
-    };
-}
+// Load settings from localStorage or use defaults
+const settings = JSON.parse(localStorage.getItem('testSettings')) || {
+    trialsPerSession: isDemo ? 16 : 5,
+    noGoCountPerSession: isDemo ? 2 : 2,
+    noGoNumber: 3,
+    delayBeforeNextNumber: 900,
+    numberToDotDuration: 250,
+    incorrectDelayDuration: 3000,
+    probeCount: isDemo ? 4 : 20
+};
 
 // Experiment Configuration
-const trialsPerSession = settings.trialsPerSession;
+let trialsPerSession = settings.trialsPerSession;
 const noGoCountPerSession = settings.noGoCountPerSession;
 const noGoNumber = settings.noGoNumber;
 const delayBeforeNextNumber = settings.delayBeforeNextNumber;
 const numberToDotDuration = settings.numberToDotDuration;
 const incorrectDelayDuration = settings.incorrectDelayDuration;
-const probeCount = settings.probeCount || 0;
+const probeCount = settings.probeCount;
 
 // Experiment Variables
 let trialCount = 0;
@@ -48,26 +35,33 @@ let numberSequence = [];
 let startTime = 0;
 let timeoutId1 = null;
 let timeoutId2 = null;
-let isSpacePressed = false; // Flag baru untuk melacak status spacebar
+let isSpacePressed = false;
+let probeAppearCount = 0;
 
 // Probe Variables
 let probeResponses = [];
 let remainingProbes = probeCount;
 let probeActive = false;
+let probeTimestamps = [];
 
 function getLocalTimestamp() {
     const now = new Date();
     const options = { timeZone: "Asia/Jakarta" };
-    return now.toLocaleString('id-ID', options) + '.' + now.getMilliseconds().toString().padStart(3, "0");
+    const localeString = now.toLocaleString('id-ID', options).replace(',', '');
+    return localeString + '.' + now.getMilliseconds().toString().padStart(3, "0");
 }
 
 function showProbe() {
     if (probeActive || remainingProbes <= 0) return;
     
     probeActive = true;
+    probeAppearCount++;
     allowResponse = false;
     clearTimeout(timeoutId1);
     clearTimeout(timeoutId2);
+
+    const timestamp = getLocalTimestamp();
+    probeTimestamps.push({ type: 'appear', timestamp });
     
     const probeModal = document.createElement('div');
     probeModal.id = 'probeModal';
@@ -86,18 +80,32 @@ function showProbe() {
     
     probeModal.innerHTML = `
         <div style="background-color: #1a1a1a; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px;">
-            <h2 style="color: #28a745; margin-bottom: 15px;">Pernyataan mana yang paling menggambarkan kondisi mental anda sebelum layar ini muncul??</h2>
-            <p style="font-size: 18px; margin-bottom: 20px;">Tekan 1: Fokus pada tugas, Tekan 2: Mind wandering</p>
+            <h2 style="color: #28a745; margin-bottom: 15px;">Pernyataan mana yang paling menggambarkan kondisi mental anda sebelum layar ini muncul?</h2>
+            <p style="font-size: 18px; margin-bottom: 20px;">Tekan 1: Fokus pada tugas, Tekan 2: Mind Wandering</p>
             <div id="probeResponse" style="margin-top: 20px; color: #ffc107; font-weight: bold; font-size: 20px;"></div>
         </div>
     `;
     
     document.body.appendChild(probeModal);
+
+    responses.push({
+        number: 'PROBE',
+        responseTime: null,
+        correct: null,
+        timestamp,
+        isProbe: true,
+        probeAppearNumber: probeAppearCount
+    });
 }
 
 function handleProbeResponse(response) {
-    const responseText = response === 1 ? 'Fokus' : 'Mind wandering';
-    probeResponses.push(response);
+    const responseText = response === 1 ? 'Fokus' : 'Mind Wandering';
+    const timestamp = getLocalTimestamp();
+    probeResponses.push({
+        response,
+        timestamp,
+        appearTimestamp: probeTimestamps[probeTimestamps.length - 1].timestamp
+    });
     remainingProbes--;
     
     document.getElementById('probeResponse').textContent = `Anda menjawab: ${responseText}`;
@@ -110,23 +118,6 @@ function handleProbeResponse(response) {
     }, 1000);
 }
 
-document.addEventListener('keydown', (e) => {
-    if (probeActive) {
-        if (e.key === '1') {
-            handleProbeResponse(1);
-            e.preventDefault();
-        } else if (e.key === '2') {
-            handleProbeResponse(2);
-            e.preventDefault();
-        }
-        return;
-    }
-    
-    if (e.code === 'Space' && isExperimentRunning && !probeActive) {
-        checkResponse(numberSequence[trialCount]);
-    }
-});
-
 function startExperiment() {
     document.getElementById('feedback').textContent = '';
     isExperimentRunning = true;
@@ -136,8 +127,10 @@ function startExperiment() {
     goMistakes = 0;
     noGoTrials = 0;
     noGoMistakes = 0;
-    remainingProbes = probeCount;
+    
+    remainingProbes = probeCount; // Menggunakan nilai dari settings
     probeResponses = [];
+    probeAppearCount = 0;
     generateNumberSequence();
     displayNumber();
 }
@@ -198,7 +191,6 @@ function displayNumber() {
                 document.getElementById('number-display').textContent = '🔴';
                 document.getElementById('feedback').textContent = '❌ Tidak tepat! Anda melewatkan responsnya.';
                 
-                // Add delay for missed Go trials
                 setTimeout(() => {
                     trialCount++;
                     proceedToNextTrial();
@@ -218,22 +210,29 @@ function displayNumber() {
 }
 
 function proceedToNextTrial() {
-    // Check if we should show a probe
-    if (remainingProbes > 0 && trialCount < trialsPerSession) {
-        const probeProbability = remainingProbes / (trialsPerSession - trialCount);
-        if (Math.random() < probeProbability) {
-            setTimeout(showProbe, 500);
-            return;
-        }
+    // Show probe every 5 trials in mindwondering mode
+    const mindwonderingEnabled = settings.mindwonderingEnabled;
+    
+    // Show probe if conditions are met
+    if (probeCount > 0 && 
+        remainingProbes > 0 && 
+        trialCount > 0 && 
+        (mindwonderingEnabled ? (trialCount % 44 === 0 && trialCount <= (probeCount * 44)) : 
+                               (trialCount % Math.floor(trialsPerSession / probeCount) === 0)) && 
+        trialCount < trialsPerSession) {
+        setTimeout(showProbe, 500);
+        return;
     }
     
     // Continue with next trial
     displayNumber();
 }
 
+
+
 function checkResponse(number) {
-    if (!allowResponse || userResponded || probeActive || isSpacePressed) return; // Tambah pengecekan isSpacePressed
-    isSpacePressed = true; // Set flag saat space ditekan
+    if (!allowResponse || userResponded || probeActive || isSpacePressed) return;
+    isSpacePressed = true;
     userResponded = true;
     allowResponse = false;
 
@@ -258,10 +257,12 @@ function checkResponse(number) {
             timestamp 
         });
         
+        // Tambahkan delay minimal 1150ms sebelum lanjut ke trial berikutnya
+        const remainingTime = Math.max(0, (numberToDotDuration + delayBeforeNextNumber) - responseTime);
         setTimeout(() => {
             trialCount++;
             proceedToNextTrial();
-        }, 500);
+        }, remainingTime);
     } else {
         noGoMistakes++;
         document.getElementById('feedback').textContent = '❌ Tidak tepat! Anda seharusnya tidak menekan tombol spasi.';
@@ -279,7 +280,7 @@ function checkResponse(number) {
     }
 }
 
-// Event listener untuk keydown dan keyup
+
 document.addEventListener('keydown', (e) => {
     if (probeActive) {
         if (e.code === 'Digit1') {
@@ -299,7 +300,7 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('keyup', (e) => {
     if (e.code === 'Space') {
-        isSpacePressed = false; // Reset flag saat space dilepas
+        isSpacePressed = false;
     }
 });
 
@@ -314,7 +315,9 @@ function endExperiment() {
         noGoMistakes, 
         responses,
         probeCount, 
-        probeResponses
+        probeResponses,
+        probeTimestamps,
+        probeAppearCount
     }));
 
     window.location.href = "results.html";

@@ -40,10 +40,10 @@
             <h2>Test Settings</h2>
             <form id="settingsForm">
                 <label for="trialsPerSession">Total Trials:</label>
-                <input type="number" id="trialsPerSession" min="1" required>
+                <input type="number" id="trialsPerSession" value="1600" min="1" required>
                 
                 <label for="noGoCountPerSession">No-Go Trials Count:</label>
-                <input type="number" id="noGoCountPerSession" min="1" required>
+                <input type="number" id="noGoCountPerSession" value="100" min="1" required>
                 
                 <label for="noGoNumber">No-Go Number (1-9):</label>
                 <input type="number" id="noGoNumber" value="3" min="1" max="9" required>
@@ -60,6 +60,16 @@
                 <label for="probeCount">Number of Probes (0 for disabled):</label>
                 <input type="number" id="probeCount" value="0" min="0" max="10" required>
                 
+                <!-- Tambahkan toggle Mindwondering di sini -->
+                <div class="toggle-container" style="margin-top: 15px;">
+                    <label class="toggle-label">Mindwondering?:</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mindwonderingToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+
                 <div class="button-group">
                     <button type="button" id="saveSettings">Save Settings</button>
                     <button type="button" id="backToForm">Back to Form</button>
