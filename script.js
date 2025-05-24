@@ -138,13 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (isChecked) {
         // Set default values for Mindwondering mode
-        document.getElementById('trialsPerSession').value = 900;
+        document.getElementById('trialsPerSession').value = 905;
         document.getElementById('noGoCountPerSession').value = 100;
         document.getElementById('noGoNumber').value = 3;
         document.getElementById('delayBeforeNextNumber').value = 900;
         document.getElementById('numberToDotDuration').value = 250;
         document.getElementById('incorrectDelayDuration').value = 3000;
-        document.getElementById('probeCount').value = Math.floor(900/45); // 20 probes (900/45)
+        document.getElementById('probeCount').value = Math.floor(905/45); // 20 probes (900/45)
     }
 
     
