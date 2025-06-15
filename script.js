@@ -168,20 +168,52 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Handle form submission
+// Di bagian form submission handler, tambahkan penyimpanan default settings
 document.getElementById('userForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const modal = document.getElementById('userModal');
     modal.classList.remove('show');
     
+    // Simpan data user
+    localStorage.setItem('userData', JSON.stringify({
+        fullName: document.getElementById('full-name').value,
+        age: document.getElementById('age').value,
+        gender: document.getElementById('gender').value
+    }));
+    localStorage.setItem('demoMode', 'false');
+    
+    // Simpan default settings jika belum ada
+    if (!localStorage.getItem('testSettings')) {
+        localStorage.setItem('testSettings', JSON.stringify({
+            trialsPerSession: 1600,
+            noGoCountPerSession: 190,
+            noGoNumber: 3,
+            delayBeforeNextNumber: 900,
+            numberToDotDuration: 250,
+            incorrectDelayDuration: 3000,
+            probeCount: 20,
+            mindwonderingEnabled: false
+        }));
+    }
+    
     setTimeout(() => {
         modal.style.display = 'none';
-        localStorage.setItem('userData', JSON.stringify({
-            fullName: document.getElementById('full-name').value,
-            age: document.getElementById('age').value,
-            gender: document.getElementById('gender').value
-        }));
-        localStorage.setItem('demoMode', 'false');
     }, 300);
+});
+
+// Perbaikan event listener untuk spasi
+document.addEventListener('keydown', (event) => {
+    const userModal = document.getElementById('userModal');
+    const settingsModal = document.getElementById('settingsModal');
+    
+    if (event.code === 'Space' && 
+        countdownValue === 3 && 
+        getComputedStyle(userModal).display === 'none' && 
+        getComputedStyle(settingsModal).display === 'none' &&
+        localStorage.getItem('userData') &&
+        localStorage.getItem('testSettings')) {
+        startCountdown();
+    }
 });
 
 // Start countdown when space is pressed ONLY if modal is not showing
@@ -193,7 +225,8 @@ document.addEventListener('keydown', (event) => {
         countdownValue === 3 && 
         userModal.style.display === 'none' && 
         settingsModal.style.display === 'none' &&
-        localStorage.getItem('demoMode') !== 'true') {
+        localStorage.getItem('userData') && // Pastikan userData sudah ada
+        localStorage.getItem('demoMode') === 'false') { // Pastikan bukan demo mode
         startCountdown();
     }
 });

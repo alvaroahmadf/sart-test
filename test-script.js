@@ -3,8 +3,8 @@ const isDemo = localStorage.getItem('demoMode') === 'true';
 
 // Load settings from localStorage or use defaults
 const settings = JSON.parse(localStorage.getItem('testSettings')) || {
-    trialsPerSession: isDemo ? 16 : 5,
-    noGoCountPerSession: isDemo ? 2 : 2,
+    trialsPerSession: isDemo ? 16 : 1600,
+    noGoCountPerSession: isDemo ? 2 : 190,
     noGoNumber: 3,
     delayBeforeNextNumber: 900,
     numberToDotDuration: 250,
