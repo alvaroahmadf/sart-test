@@ -180,21 +180,19 @@ document.getElementById('userForm').addEventListener('submit', (e) => {
         age: document.getElementById('age').value,
         gender: document.getElementById('gender').value
     }));
-    localStorage.setItem('demoMode', 'false');
     
-    // Simpan default settings jika belum ada
-    if (!localStorage.getItem('testSettings')) {
-        localStorage.setItem('testSettings', JSON.stringify({
-            trialsPerSession: 1600,
-            noGoCountPerSession: 190,
-            noGoNumber: 3,
-            delayBeforeNextNumber: 900,
-            numberToDotDuration: 250,
-            incorrectDelayDuration: 3000,
-            probeCount: 20,
-            mindwonderingEnabled: false
-        }));
-    }
+    // Reset demo mode dan settings
+    localStorage.setItem('demoMode', 'false');
+    localStorage.setItem('testSettings', JSON.stringify({
+        trialsPerSession: 1600,
+        noGoCountPerSession: 190,
+        noGoNumber: 3,
+        delayBeforeNextNumber: 900,
+        numberToDotDuration: 250,
+        incorrectDelayDuration: 3000,
+        probeCount: 20,
+        mindwonderingEnabled: false
+    }));
     
     setTimeout(() => {
         modal.style.display = 'none';
@@ -269,4 +267,12 @@ document.getElementById('demoBtn').addEventListener('mouseout', () => {
 
 document.getElementById('demoProbeContainer').addEventListener('mouseout', () => {
     document.getElementById('demoProbeContainer').style.display = 'none';
+});
+
+window.addEventListener('load', () => {
+    if (window.location.pathname.endsWith('index.html')) {
+        localStorage.removeItem('demoMode');
+        localStorage.removeItem('sartResults');
+        // Biarkan testSettings dan userData tetap tersimpan
+    }
 });

@@ -1,16 +1,27 @@
-// Check demo mode first
+// Perbaikan cara load settings
 const isDemo = localStorage.getItem('demoMode') === 'true';
 
-// Load settings from localStorage or use defaults
-const settings = JSON.parse(localStorage.getItem('testSettings')) || {
-    trialsPerSession: isDemo ? 16 : 1600,
-    noGoCountPerSession: isDemo ? 2 : 190,
+// Gunakan default settings untuk mode normal
+const defaultSettings = isDemo ? {
+    trialsPerSession: 18,
+    noGoCountPerSession: 2,
     noGoNumber: 3,
     delayBeforeNextNumber: 900,
     numberToDotDuration: 250,
     incorrectDelayDuration: 3000,
-    probeCount: isDemo ? 4 : 20
+    probeCount: 0  // Default probe non-aktif di demo
+} : {
+    trialsPerSession: 1600,
+    noGoCountPerSession: 190,
+    noGoNumber: 3,
+    delayBeforeNextNumber: 900,
+    numberToDotDuration: 250,
+    incorrectDelayDuration: 3000,
+    probeCount: 20
 };
+
+// Load settings dari localStorage atau gunakan default
+const settings = JSON.parse(localStorage.getItem('testSettings')) || defaultSettings;
 
 // Experiment Configuration
 let trialsPerSession = settings.trialsPerSession;
