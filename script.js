@@ -190,7 +190,7 @@ document.getElementById('userForm').addEventListener('submit', (e) => {
         delayBeforeNextNumber: 900,
         numberToDotDuration: 250,
         incorrectDelayDuration: 3000,
-        probeCount: 20,
+        probeCount: 0,
         mindwonderingEnabled: false
     }));
     
